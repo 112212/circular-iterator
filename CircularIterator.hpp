@@ -1,14 +1,8 @@
 #ifndef CIRCULAR_ITERATOR_HPP
 #define CIRCULAR_ITERATOR_HPP
 #include <iterator>
-
-// #define DEBUG
-#ifdef DEBUG
-#define dbg(x) x
 #include <iostream>
-#else
-#define dbg(x)
-#endif
+
 template <typename T>
 class CircularIterator {
 	public:
@@ -42,26 +36,39 @@ class CircularIterator {
 					return *this;
 				}
 				
-				iterator& operator--() {
-					num--;
-					if(num < 0) {
-						num = size-1;
-					}
-					return *this;
-				}
-				
 				iterator operator++(int) {
 					iterator retval = *this; 
 					++(*this);
 					return retval;
 				}
 				
+				iterator& operator--() {
+					if(num == 0) {
+						num = size-1;
+					} else {
+						num--;
+					}
+					return *this;
+				}
+				
+				iterator operator--(int) {
+					iterator old = *this;
+					if(num == 0) {
+						num = size-1;
+					} else {
+						num--;
+					}
+					return old;
+				}
+				
+				
+				
 				bool operator==(iterator other) const {
 					return num == other.num;
 				}
 				
 				bool operator<(iterator other) const {
-					return !(num < head && other.num > head);
+					return (num < other.num && other.num <= head) || (num > head && other.num <= head);
 				}
 
 				bool operator!=(iterator other) const {
@@ -69,27 +76,19 @@ class CircularIterator {
 				}
 				
 				iterator operator+(size_t n) const {
-					dbg(std::cout << "operator+: " << n << "\n";)
-					return iterator(obj, num+n % size, head);
+					iterator it = *this;
+					it+=n;
+					return it;
 				}
 				
 				iterator operator-(size_t n) const {
-					dbg(std::cout << "operator+: " << n << "\n";)
-					return iterator(obj, normalize(num-n), head);
+					iterator it = *this;
+					it-=n;
+					return it;
 				}
-				
-				inline int normalize(size_t n) const {
-					if(n < 0) {
-						return (n % size) + n;
-					} else {
-						return n % size;
-					}
-				}
-				
+
 				difference_type operator-(iterator it) const {
-					dbg(std::cout << "operator-: " << num << " - " << it.num << "\n";)
 					if(num < it.num) {
-						// dbg(std::cout << "\toperator-: " << size << " - " << it.num << " + " << num << "\n";)
 						return size - it.num + num;
 					} else if(num > it.num) {
 						return num - it.num;
@@ -98,18 +97,36 @@ class CircularIterator {
 					}
 				}
 				
+				iterator end() {
+					return iterator(obj, head, head);
+				}
+				
 				iterator& operator+=(size_t n) {
-					dbg(std::cout << "operator+=: " << num << " + " << n << "\n";)
-					num+=n;
+					size_t dist = end() - *this;
+					num+=std::min(dist,n);
 					if(num >= size) {
 						num = num % size;
 					}
 					return *this;
 				}
+				
+				iterator& operator-=(size_t n) {
+					size_t dist = end() - *this;
+					size_t sub = std::min(size-dist,n);
+					if(sub > num) {
+						num = size - (sub - num);
+					} else {
+						num -= sub;
+					}
+					return *this;
+				}
 
 				reference operator*() const {
-					dbg(std::cout << "operator*: " << num << "\n";)
 					return obj->operator[](num);
+				}
+				
+				value_type* operator->() const {
+					return &obj->operator[](num);
 				}
 				
 				size_t GetIndex() {
