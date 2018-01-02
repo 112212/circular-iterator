@@ -17,24 +17,22 @@ class CircularIterator {
 		class iterator: public std::iterator<
 						std::random_access_iterator_tag, // iterator_category
 						typename T::value_type, // value_type
-						int, // difference_type
+						size_t, // difference_type
 						const typename T::value_type*, // pointer
 						typename T::value_type  // reference
 					>
 		{
 			private:
 				T* obj;
-				int num;
-				int size;
-				int head;
+				size_t num;
+				size_t size;
+				size_t head;
 				
 			public:
-				// using value_type = CircularIterator<T>::value_type;
-				// using value_type = int;
-				using difference_type = typename std::iterator<std::random_access_iterator_tag, value_type, int, const value_type*, value_type&>::difference_type;
-				using reference = typename std::iterator<std::random_access_iterator_tag, value_type, int, const value_type*, value_type&>::reference;
+				using difference_type = typename std::iterator<std::random_access_iterator_tag, value_type, size_t, const value_type*, value_type&>::difference_type;
+				using reference = typename std::iterator<std::random_access_iterator_tag, value_type, size_t, const value_type*, value_type&>::reference;
 						
-				explicit iterator(T* _obj, int _num, int _head) : obj(_obj), num(_num), size(_obj->size()), head(_head) {}
+				explicit iterator(T* _obj, size_t _num, size_t _head) : obj(_obj), num(_num), size(_obj->size()), head(_head) {}
 				
 				iterator& operator++() {
 					num++;
@@ -70,17 +68,17 @@ class CircularIterator {
 					return num != other.num;
 				}
 				
-				iterator operator+(int n) const {
+				iterator operator+(size_t n) const {
 					dbg(std::cout << "operator+: " << n << "\n";)
 					return iterator(obj, num+n % size, head);
 				}
 				
-				iterator operator-(int n) const {
+				iterator operator-(size_t n) const {
 					dbg(std::cout << "operator+: " << n << "\n";)
 					return iterator(obj, normalize(num-n), head);
 				}
 				
-				inline int normalize(int n) const {
+				inline int normalize(size_t n) const {
 					if(n < 0) {
 						return (n % size) + n;
 					} else {
@@ -100,7 +98,7 @@ class CircularIterator {
 					}
 				}
 				
-				iterator& operator+=(int n) {
+				iterator& operator+=(size_t n) {
 					dbg(std::cout << "operator+=: " << num << " + " << n << "\n";)
 					num+=n;
 					if(num >= size) {
@@ -114,7 +112,7 @@ class CircularIterator {
 					return obj->operator[](num);
 				}
 				
-				int GetIndex() {
+				size_t GetIndex() {
 					return num;
 				}
 		};
@@ -126,11 +124,11 @@ class CircularIterator {
 			return iterator(m_obj, m_head, m_head);
 		}
 		
-		void SetHead(int head) {
+		void SetHead(size_t head) {
 			m_head = head;
 		}
 		
-		void SetTail(int tail) {
+		void SetTail(size_t tail) {
 			m_tail = tail;
 		}
 		
@@ -161,9 +159,9 @@ class CircularIterator {
 		
 	private:
 		T* m_obj;
-		int m_size;
-		int m_head;
-		int m_tail;
+		size_t m_size;
+		size_t m_head;
+		size_t m_tail;
 };
 
 template<typename C>
