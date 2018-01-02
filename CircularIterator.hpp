@@ -29,6 +29,8 @@ class CircularIterator {
 				int head;
 				
 			public:
+				// using value_type = CircularIterator<T>::value_type;
+				// using value_type = int;
 				using difference_type = typename std::iterator<std::random_access_iterator_tag, value_type, int, const value_type*, value_type&>::difference_type;
 				using reference = typename std::iterator<std::random_access_iterator_tag, value_type, int, const value_type*, value_type&>::reference;
 						
@@ -123,6 +125,32 @@ class CircularIterator {
 		iterator end() {
 			return iterator(m_obj, m_head, m_head);
 		}
+		
+		void SetHead(int head) {
+			m_head = head;
+		}
+		
+		void SetTail(int tail) {
+			m_tail = tail;
+		}
+		
+		
+		template<typename Iterator>
+		void insert(Iterator it1, Iterator it2) {
+			auto it = begin();
+			auto itend = end();
+			int dist = it - itend;
+			int c=0;
+			for(; it1 != it2; it1++, itend++, c++) {
+				*itend = *it1;
+			}
+			
+			m_head = itend.GetIndex();
+			if(c >= dist) {
+				m_tail = (m_head+1) % m_size;
+			}
+		}
+		
 
 		CircularIterator(T& obj, int tail, int head) {
 			m_obj = &obj;

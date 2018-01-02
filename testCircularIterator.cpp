@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <vector>
 #include <array>
+#include <numeric>
 using std::cout;
 using std::endl;
 int main() {
@@ -28,11 +29,12 @@ int main() {
 	auto itlb = std::lower_bound(circular.begin(), circular.end(), 1);
 	std::cout << "[" << itlb.GetIndex() << "] " << *itlb << "\n";
 
-	/*
-	for(int &t : send) {
-		// t = 0;
-	}
-	*/
+	std::vector<int> tvec(14);
+	std::iota(tvec.begin(), tvec.end(), 100);
+	
+	std::cout << "before: " << circular.begin().GetIndex() << " " << circular.end().GetIndex() << "\n";
+	circular.insert(tvec.begin(), tvec.end());
+	std::cout << "after: " << circular.begin().GetIndex() << " " << circular.end().GetIndex() << "\n";
 	
 	for(int t : circular) {
 		cout << "iter: " << t << endl;
